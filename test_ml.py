@@ -1,28 +1,51 @@
 import pytest
-# TODO: add necessary import
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+
+from ml.data import process_data
+from ml.model import train_model, compute_model_metrics, inference
+
+data = pd.read_csv("data/census.csv")
 
 # TODO: implement the first test. Change the function name and input as needed
-def test_one():
+def test_model_type():
     """
-    # add description for the first test
+    Test that the train_model returns a RandomForestClassifier.
     """
-    # Your code here
-    pass
+    cat_features = [
+        "workclass", "education", "marital-status", "occupation",
+        "relationship", "race", "sex", "native-country"
+    ]
+    X, y, _, _ = process_data(data, categorical_features=cat_features, label="salary", training=True)
+    model = train_model(X, y)
+    assert isinstance(model, RandomForestClassifier)
 
 
 # TODO: implement the second test. Change the function name and input as needed
-def test_two():
+def test_compute_model_metrics_output():
     """
-    # add description for the second test
+    Test compute_model_metrics returns expected types and values for simple input.
     """
-    # Your code here
-    pass
+    y_true = np.array([1, 0, 1, 1])
+    y_pred = np.array([1, 0, 0, 1]) 
+
+    precision, recall, f1 = compute_model_metrics(y_true, y_pred)
+    assert round(precision, 2) == 1.00
+    assert round(recall, 2) == 0.67
+    assert round(f1, 2) == 0.80
 
 
 # TODO: implement the third test. Change the function name and input as needed
-def test_three():
+def test_inference_shape():
     """
-    # add description for the third test
+    Test that inference returns predictions of the correct shape.
     """
-    # Your code here
-    pass
+    cat_features = [
+        "workclass", "education", "marital-status", "occupation",
+        "relationship", "race", "sex", "native-country"
+    ]
+    X, y, _, _ = process_data(data, categorical_features=cat_features, label="salary", training=True)
+    model = train_model(X, y)
+    preds = inference(model, X)
+    assert len(preds) == len(X)
